@@ -1,0 +1,6 @@
+[submodule "src/haskell-lehmer"]
+	path = src/haskell-lehmer
+	url = https://github.com/zirrostig/haskell-lehmer.git
+[submodule "src/pcg-random"]
+	path = src/pcg-random
+	url = https://github.com/cchalmers/pcg-random.git

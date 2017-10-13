@@ -8,16 +8,16 @@
 --    Fast splittable pseudorandom number generators
 --    Comm ACM, 49(10), Oct 2014, pp453-472.
 
-module Generator.SplitMix (splitMix) where
+module Generator.SplitMix (splitMix32, splitMix64) where
 
 import Data.Bits (popCount, shiftR, xor, (.|.))
 import Data.Int  (Int32, Int64)
-import Data.Word (Word32)
-import Text.Read (read)
+import Data.Word (Word32, Word64)
 
 data Seed = Seed
-  { value :: Int64,
-    gamma :: Int64 }
+  { value :: Int64
+  , gamma :: Int64
+  }
 
 -- A predefined gamma value's needed for initializing the "root" instances of SplittableRandom
 -- that is, instances not produced by splitting an already existing instance. We choose:
@@ -78,8 +78,18 @@ nextInt32 s0 = let s1 = nextSeed s0 in mix32 (value s1)
 nextInt64 :: Seed -> Int64
 nextInt64 s0 = let s1 = nextSeed s0 in mix64 (value s1)
 
-splitMix :: String -> Int -> [Word32]
-splitMix input num = if num < 1 then stream seed' else take num (stream seed')
-  where seed' = ofInt64 (read input :: Int64)
-        stream :: Seed -> [Word32]
-        stream seed = (fromIntegral (nextInt32 seed) :: Word32) : stream (nextSeed seed)
+splitMix32 :: Int64 -> Int -> [Word32]
+splitMix32 seed num
+  | num < 1   = []
+  | otherwise = take num $ stream (ofInt64 seed)
+  where
+    stream :: Seed -> [Word32]
+    stream seed = (fromIntegral (nextInt32 seed) :: Word32) : stream (nextSeed seed)
+
+splitMix64 :: Int64 -> Int -> [Word64]
+splitMix64 seed num
+  | num < 1   = []
+  | otherwise = take num $ stream (ofInt64 seed)
+  where
+    stream :: Seed -> [Word64]
+    stream seed = (fromIntegral (nextInt64 seed) :: Word64) : stream (nextSeed seed)

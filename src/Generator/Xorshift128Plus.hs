@@ -10,7 +10,7 @@
 module Generator.Xorshift128Plus (xorshift128Plus) where
 
 import Data.Word(Word64(..))
-import Data.Bits
+import Data.Bits (xor, shiftL, shiftR)
 
 -- Random number generator.
 data Gen = Gen {-# UNPACK #-} !Word64 {-# UNPACK #-} !Word64
@@ -46,9 +46,12 @@ word64max :: Double
 word64max = fromIntegral (maxBound :: Word64)
 {-# INLINE word64max #-}
 
-xorshift128Plus :: String -> Int -> [Word64]
-xorshift128Plus input num = if num < 1 then stream gen' else take num (stream gen')
-  where gen' = initialize (read input :: Word64)
-        stream :: Gen -> [Word64]
-        stream gen = value : stream seed
-          where (value, seed) = next gen
+xorshift128Plus :: Word64 -> Int -> [Word64]
+xorshift128Plus seed num
+  | num < 1   = []
+  | otherwise = take num $ stream (initialize seed)
+  where
+    stream :: Gen -> [Word64]
+    stream gen = value : stream seed
+      where
+        (value, seed) = next gen
