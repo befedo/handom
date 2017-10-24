@@ -7,16 +7,19 @@ name:                handom
 -- PVP summary:      +-+------- breaking API changes
 --                   | | +----- non-breaking API additions
 --                   | | | +--- code changes with no API change
-version:             0.1.0.0
+version:             0.2.0.0
 
 -- A short (one-line) description of the package.
 synopsis:            Collection of Pseudo-Random-Number Generators
 
 -- A longer description of the package.
--- description:
+description:         A Command-Line-Tool to generate Pseudo-Random-Numbers.
 
--- URL for the project homepage or repository.
-homepage:            https://github.com/befedo/handom
+-- URL for the project homepage.
+homepage:           https://github.com/befedo/handom
+
+-- Github location where to send bug-reports.
+bug-reports:        https://github.com/befedo/handom/issues
 
 -- The license under which the package is released.
 license:             BSD3
@@ -45,13 +48,13 @@ extra-source-files:  ChangeLog.md
 -- Constraint on the version of Cabal needed to build this package.
 cabal-version:       >=1.10
 
-
 executable handom
   -- .hs or .lhs file containing the Main module.
   main-is:             Main.hs
 
   -- Modules included in this executable, other than Main.
   other-modules:       Generator.Lehmer
+                       Generator.MWC
                        Generator.PCG
                        Generator.SplitMix
                        Generator.Xorshift128Plus
@@ -60,6 +63,7 @@ executable handom
                        System.Random.Lehmer.Constants
                        System.Random.Lehmer.Util
                        System.Random.Lehmer.State
+                       System.Random.MWC
                        System.Random.PCG
                        System.Random.PCG.Pure
                        System.Random.PCG.Class
@@ -77,6 +81,8 @@ executable handom
                        array       >=0.5 && <0.6,
                        primitive   >=0.4 && < 0.7,
                        random      >=1.0 && < 2.0,
+                       time,
+                       vector      >= 0.7,
                        cmdargs,
                        binary,
                        bytestring,
@@ -84,7 +90,7 @@ executable handom
                        mtl
 
   -- Directories containing source files.
-  hs-source-dirs:      src, src/haskell-lehmer, src/pcg-random/src
+  hs-source-dirs:      src, src/haskell-lehmer, src/mwc-random src/pcg-random/src
 
   -- Base language which the package is written in.
   default-language:    Haskell2010
@@ -107,3 +113,9 @@ executable handom
   includes:            pcg_variants.h
 
   install-includes:    pcg_variants.h
+
+source-repository head
+
+  type:             git
+
+  location:         git://github.com/befedo/handom

@@ -4,3 +4,6 @@
 [submodule "src/pcg-random"]
 	path = src/pcg-random
 	url = https://github.com/cchalmers/pcg-random.git
+[submodule "src/mwc-random"]
+	path = src/mwc-random
+	url = https://github.com/bos/mwc-random.git

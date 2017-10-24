@@ -51,7 +51,7 @@ xorshift128Plus seed num
   | num < 1   = []
   | otherwise = take num $ stream (initialize seed)
   where
-    stream :: Gen -> [Word64]
-    stream gen = value : stream seed
-      where
-        (value, seed) = next gen
+  stream :: Gen -> [Word64]
+  stream gen = value : stream seed
+    where
+    (value, seed) = next gen

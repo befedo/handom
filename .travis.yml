@@ -1,1 +1,5 @@
 language: haskell
+
+cache:
+ directories:
+ - $HOME/.cabal

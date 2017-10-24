@@ -4,6 +4,7 @@ import Data.Word (Word32, Word64)
 import Data.Int  (Int64)
 import Generator.Isaac (isaac)
 import Generator.Lehmer (lehmer)
+import Generator.MWC (mwc32, mwc64)
 import Generator.PCG (pcg32, pcg64)
 import Generator.SplitMix (splitMix32, splitMix64)
 import Generator.Xorshift128Plus (xorshift128Plus)
@@ -17,9 +18,10 @@ import System.Environment (getArgs, withArgs)
 
 data Opts = Isaac {chars :: String, length_ :: Int, file :: String}
           | Lehmer {seed :: Int, length_ :: Int, file :: String}
+          | Mwc {word32 :: Word32, length_ :: Int, file :: String, wide :: Bool}
           | Pcg {b_seed :: Word64, a_seed :: Word64, length_ :: Int, file :: String, wide :: Bool}
           | SplitMix {int :: Int64, length_ :: Int, file :: String, wide :: Bool}
-          | Xoroshiro {word :: Word64, length_ :: Int, file :: String}
+          | Xoroshiro {word64 :: Word64, length_ :: Int, file :: String}
           deriving (Show, Data, Typeable)
 
 isaacOpts :: Opts
@@ -36,6 +38,13 @@ lehmerOpts = Lehmer
   , file = def &= help "Specify the binary output File" &= typ "String"
   }
 
+mwcOpts :: Opts
+mwcOpts = Mwc
+  { word32 = def &= help "Seed for the MWC-Generator" &= typ "Word32" &= name "seed" &= name "s" &= explicit
+  , length_ = def &= help "Output length (number of values)" &= typ "Int"
+  , wide = def &= help "Output width (wide defines 64Bit output while the default is 32Bit)" &= typ "Bool"
+  , file = def &= help "Specify the binary output File" &= typ "String"
+  }
 pcgOpts :: Opts
 pcgOpts = Pcg
   { b_seed = def &= help "Lower Part of the Seed for the PCG-Generator" &= typ "Word64"
@@ -55,7 +64,7 @@ splitMixOpts = SplitMix
 
 xoroshiroOpts :: Opts
 xoroshiroOpts = Xoroshiro
-  { word = def &= help "Seed for the Xoroshiro128Plus-Generator" &= typ "Word64" &= name "seed" &= name "s" &= explicit
+  { word64 = def &= help "Seed for the Xoroshiro128Plus-Generator" &= typ "Word64" &= name "seed" &= name "s" &= explicit
   , length_ = def &= help "Output length (number of values)" &= typ "Int"
   , file = def &= help "Specify the binary output File" &= typ "String"
   }
@@ -66,17 +75,25 @@ main = do
   opts <- (if null args then withArgs ["--help"] else id) getOpts
   handleOpts opts
 
-getOpts = cmdArgs $ modes [pcgOpts ,isaacOpts, lehmerOpts, splitMixOpts, xoroshiroOpts]
+getOpts = cmdArgs $ modes [isaacOpts, lehmerOpts, mwcOpts, pcgOpts, splitMixOpts, xoroshiroOpts]
   &= program "handom"
   &= help "A command line program for generating Pseudo-Random-Numbers."
   &= helpArg [explicit, name "help", name "h"]
 
 handleOpts :: Opts -> IO ()
+handleOpts o@Mwc{}       = handleMwc (wide o) (word32 o) (length_ o) (file o)
 handleOpts o@Pcg{}       = handlePcg (wide o) (a_seed o) (b_seed o) (length_ o) (file o)
 handleOpts o@Isaac{}     = handleIsaac (chars o) (length_ o) (file o)
 handleOpts o@Lehmer{}    = handleLehmer (seed o) (length_ o) (file o)
 handleOpts o@SplitMix{}  = handleSplitMix (wide o) (int o) (length_ o) (file o)
-handleOpts o@Xoroshiro{} = handleXoroshiro (word o) (length_ o) (file o)
+handleOpts o@Xoroshiro{} = handleXoroshiro (word64 o) (length_ o) (file o)
+
+handleMwc :: Bool -> Word32 -> Int -> String -> IO ()
+handleMwc wide seed length_ file
+  | wide     && file == "" = mapM_ (printf "0x%016X\n") (mwc64 seed length_)
+  | wide     && file /= "" = writeBin64 (mwc64 seed length_) file
+  | not wide && file == "" = mapM_ (printf "0x%08X\n") (mwc32 seed length_)
+  | otherwise              = writeBin32 (mwc32 seed length_) file
 
 handlePcg :: Bool -> Word64 -> Word64 -> Int -> String -> IO ()
 handlePcg wide a b length_ file
@@ -103,16 +120,16 @@ handleSplitMix wide seed length_ file
   | otherwise              = writeBin32 (splitMix32 seed length_) file
 
 handleXoroshiro :: Word64 -> Int -> String -> IO ()
-handleXoroshiro word length_ file
-  | file == "" = mapM_ (printf "0x%016X\n") (xorshift128Plus word length_)
-  | otherwise  = writeBin64 (xorshift128Plus word length_) file
+handleXoroshiro seed length_ file
+  | file == "" = mapM_ (printf "0x%016X\n") (xorshift128Plus seed length_)
+  | otherwise  = writeBin64 (xorshift128Plus seed length_) file
 
 writeBin32 :: [Word32] -> String -> IO ()
 writeBin32 values file = BsLazy.writeFile file output
   where
-    output = runPut $ mapM_ putWord32le values
+  output = runPut $ mapM_ putWord32le values
 
 writeBin64 :: [Word64] -> String -> IO ()
 writeBin64 values file = BsLazy.writeFile file output
   where
-    output = runPut $ mapM_ putWord64le values
+  output = runPut $ mapM_ putWord64le values

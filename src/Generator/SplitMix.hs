@@ -83,13 +83,13 @@ splitMix32 seed num
   | num < 1   = []
   | otherwise = take num $ stream (ofInt64 seed)
   where
-    stream :: Seed -> [Word32]
-    stream seed = (fromIntegral (nextInt32 seed) :: Word32) : stream (nextSeed seed)
+  stream :: Seed -> [Word32]
+  stream seed = (fromIntegral (nextInt32 seed) :: Word32) : stream (nextSeed seed)
 
 splitMix64 :: Int64 -> Int -> [Word64]
 splitMix64 seed num
   | num < 1   = []
   | otherwise = take num $ stream (ofInt64 seed)
   where
-    stream :: Seed -> [Word64]
-    stream seed = (fromIntegral (nextInt64 seed) :: Word64) : stream (nextSeed seed)
+  stream :: Seed -> [Word64]
+  stream seed = (fromIntegral (nextInt64 seed) :: Word64) : stream (nextSeed seed)

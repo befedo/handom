@@ -7,3 +7,7 @@
 ## 0.2.0.0 -- 2017-10-13
 
 * Added some submodules and CLI.
+
+## 0.3.0.0 -- 2017-10-24
+
+* Added another submodule.
