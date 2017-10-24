@@ -1,5 +1,12 @@
 language: haskell
-
 cache:
- directories:
- - $HOME/.cabal
+  directories:
+  - "$HOME/.cabal"
+deploy:
+  provider: releases
+  api_key:
+    secure: RX689T7XEk2rF2ktVl9E24x8+wgv7oE4NtEBCCObIhxmEEAELZ00GWrQFxC40Jf5+xLDlHfbTn5ELoBujzPJnNy2zWM//lEwph2Kw91NxHwqZuzfb1LqPZAAfa7UlG8kZi1YP/CQsY6NoHSt270xpOFEgmQC1mJaL2lDEOHrhZWea8VhVcct2jNTmb2gQCW6sSTAbezSQp6gJg2U392HfF4YmRZmG9vWYmZIGSis8gXhEfMxOBCV+bB3qlm2xya4N/zk05Jq2KrynSS994tMu7kZ+wnCE9RzNKF4Sz7DmHLBspUvgKQNJFQPwm/BFJu6Kt9VlZ2BPvHETotjJKl7uzeCJTcssDYnXJU6qiYBdXF8x8QKBb1roXbOFSfdN2tEKYhtS104qKEGERkWYZ+sRBq4JoDe0e2pNyzu7kspPbC+ve4UoHzXfCHGIv0J5jY3XU1NzxKk2NFxFbW0THn+aGK0bYFbgxNZPgu2wue2JmpzjRFeIr6SRyDrncxWdJeABat9aT0cCBZDc4A/FREgKhL1ludgL0FzPU7j8Xckw4zMopt1tDsTZzmgZEucHN8lnRpUuKH9JVxxOYE9x5lwxkhvLNnk5JjCHr7eeruC4vG6/FnXYnUt8uiA9lKv7ttYd4VjUiXNKR6U+OBqXF7ve8yN5j1LApeJMXSwhq0h2MU=
+  skip_cleanup: true
+  file: dist/build/handom/handom
+  on:
+    repo: befedo/handom
